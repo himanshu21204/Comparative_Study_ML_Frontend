@@ -16,7 +16,7 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
       try {
         setLoading(true);
         setError(null);
-        const API_URL = process.env.REACT_APP_API_URL;
+        const API_URL = process.env.APP_API_URL;
         const response = await axios.post(`${API_URL}/train`, {
           filename,
           input_cols: inputCols,
