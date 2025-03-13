@@ -18,7 +18,7 @@ const UploadPage = ({ setColumns, setFilename }) => {
     setIsLoading(true);
     let formData = new FormData();
     formData.append("file", file);
-    const API_URL = process.env.APP_API_URL;
+    const API_URL = process.env.REACT_APP_API_URL;
     try {
       const response = await axios.post(`${API_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
