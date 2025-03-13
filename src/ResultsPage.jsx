@@ -5,6 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const ResultsPage = ({ filename, inputCols, outputCol }) => {
   const [results, setResults] = useState(null);
+  const [bestModel, setBestModel] = useState(null);
+  const [bestAccuracy, setBestAccuracy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -14,7 +16,8 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.post("https://comparative-study-ml-backend.onrender.com/train", {
+        const API_URL = process.env.REACT_APP_API_URL;
+        const response = await axios.post(`${API_URL}/train`, {
           filename,
           input_cols: inputCols,
           output_col: outputCol,
@@ -22,6 +25,8 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
         
         if (response.data.results) {
           setResults(response.data.results);
+          setBestModel(response.data.best_model);
+          setBestAccuracy(response.data.best_accuracy);
         } else {
           setError("No results received from the server.");
         }
@@ -46,22 +51,31 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
       {error && <div className="alert alert-danger mt-3">{error}</div>}
 
       {results && !loading && (
-        <table className="table table-bordered mt-3">
-          <thead className="table-dark">
-            <tr>
-              <th>Model</th>
-              <th>Accuracy</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(results).map(([model, metrics]) => (
-              <tr key={model}>
-                <td>{model}</td>
-                <td>{metrics.Accuracy !== undefined ? metrics.Accuracy : "N/A"}</td>
+        <>
+          <table className="table table-bordered mt-3">
+            <thead className="table-dark">
+              <tr>
+                <th>Model</th>
+                <th>Accuracy</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {Object.entries(results).map(([model, metrics]) => (
+                <tr key={model} className={model === bestModel ? "table-success" : ""}>
+                  <td>{model}</td>
+                  <td>{metrics.Accuracy !== undefined ? metrics.Accuracy : "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {bestModel && (
+            <div className="alert alert-info mt-3">
+              <h4>Best Model: {bestModel}</h4>
+              <p>Accuracy: {bestAccuracy}</p>
+            </div>
+          )}
+        </>
       )}
 
       <button onClick={() => navigate("/")} className="btn btn-primary mt-3 w-100">
