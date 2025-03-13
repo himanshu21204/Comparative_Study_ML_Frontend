@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const ResultsPage = ({ filename, inputCols, outputCol }) => {
@@ -22,7 +23,7 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
           input_cols: inputCols,
           output_col: outputCol,
         });
-        
+
         if (response.data.results) {
           setResults(response.data.results);
           setBestModel(response.data.best_model);
@@ -42,8 +43,16 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
     }
   }, [filename, inputCols, outputCol]);
 
+  // Convert results to chart data format
+  const chartData = results
+    ? Object.entries(results).map(([model, metrics]) => ({
+        name: model,
+        accuracy: metrics.Accuracy !== undefined ? metrics.Accuracy : 0,
+      }))
+    : [];
+
   return (
-    <div className="card p-4 shadow text-center mx-auto" style={{ maxWidth: "600px" }}>
+    <div className="card p-4 shadow text-center mx-auto" style={{ maxWidth: "700px" }}>
       <h2>Model Accuracy</h2>
 
       {loading && <p className="text-center mt-3">Training models, please wait...</p>}
@@ -60,14 +69,27 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(results).map(([model, metrics]) => (
-                <tr key={model} className={model === bestModel ? "table-success" : ""}>
-                  <td>{model}</td>
-                  <td>{metrics.Accuracy !== undefined ? metrics.Accuracy : "N/A"}</td>
+              {chartData.map((data) => (
+                <tr key={data.name} className={data.name === bestModel ? "table-success" : ""}>
+                  <td>{data.name}</td>
+                  <td>{data.accuracy}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {/* Graph Section */}
+          <div className="mt-4">
+            <h4>Accuracy Comparison</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="accuracy" fill="#007bff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
           {bestModel && (
             <div className="alert alert-info mt-3">
