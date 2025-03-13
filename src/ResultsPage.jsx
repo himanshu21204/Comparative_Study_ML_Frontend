@@ -17,7 +17,7 @@ const ResultsPage = ({ filename, inputCols, outputCol }) => {
         setLoading(true);
         setError(null);
         const API_URL = process.env.REACT_APP_API_URL;
-        const response = await axios.post(`${API_URL}/train`, {
+        const response = await axios.post(`https://comparative-study-ml-backend.onrender.com/train`, {
           filename,
           input_cols: inputCols,
           output_col: outputCol,

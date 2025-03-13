@@ -18,9 +18,8 @@ const UploadPage = ({ setColumns, setFilename }) => {
     setIsLoading(true);
     let formData = new FormData();
     formData.append("file", file);
-    const API_URL = process.env.REACT_APP_API_URL;
     try {
-      const response = await axios.post(`${API_URL}/upload`, formData, {
+      const response = await axios.post(`https://comparative-study-ml-backend.onrender.com/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setColumns(response.data.columns);
