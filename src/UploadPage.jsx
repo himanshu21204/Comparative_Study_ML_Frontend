@@ -20,7 +20,7 @@ const UploadPage = ({ setColumns, setFilename }) => {
     formData.append("file", file);
     const API_URL = process.env.APP_API_URL;
     try {
-      const response = await axios.post(`${API_URL}upload`, formData, {
+      const response = await axios.post(`${API_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setColumns(response.data.columns);
